@@ -18,6 +18,7 @@ module Meetupinator
       query_string = 'key=' + @api_key + '&group_urlname=' + group_url_name
       uri = URI::HTTP.build(host: @base_uri, path: @groups_endpoint,
                             query: query_string)
+      puts "getting " + group_url_name
       extract_meetup_id get_meetup_response(uri)
     end
 
@@ -37,11 +38,11 @@ module Meetupinator
 
     def get_meetup_response(uri)
       response = Net::HTTP.get_response uri
-      fail_if_not_ok(response)
+      fail_if_not_ok(response, uri)
       JSON.parse response.body
     end
 
-    def fail_if_not_ok(response)
+    def fail_if_not_ok(response, uri)
       return unless response.code != '200'
       msg = "Call to #{uri} failed: #{response.code} - #{response.message}"
       msg << '. ' + response.body if response.class.body_permitted?
